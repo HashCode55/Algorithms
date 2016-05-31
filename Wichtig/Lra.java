@@ -10,6 +10,7 @@ package graphs;
  * @author mehul
  */
 //Simple divide and conquer approach
+//Longest rectangle area
 public class LRA {
     static int max = -1;
     public static void main(String args[]){
