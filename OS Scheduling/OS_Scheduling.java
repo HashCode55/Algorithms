@@ -76,8 +76,8 @@ public class OS {
         print("Processes Stored");
         print("Choose the sheduling algorithm - \n "
                 + "1. Round Robin\n"
-                + " 2. Shortest Job First Preemptive\n "
-                + "3. Shortest Job First Non-Preemptive\n "
+                + " 2. Shortest Job First Pre-emptive\n "
+                + "3. Shortest Job First Non-Pre-emptive\n "
                 + "4. First Come First Serve\n "
                 + "5. Priority Scheduling\n");
         Scanner s = new Scanner(System.in);
