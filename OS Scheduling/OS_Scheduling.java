@@ -6,6 +6,7 @@
 package os;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -18,26 +19,34 @@ public class OS {
     /**
      * @param args the command line arguments
      */
-    static class Process implements Comparable<Process>{
+    static class Process{
         int processId;
         int startTime;
         int burstTime;
         int priority;
+        int waitTime;
         public Process(int processId, int startTime, int burstTime){
             this.processId = processId;
             this.startTime = startTime;
             this.burstTime = burstTime;
             //initially there is no priority
             this.priority = -1;
+            this.waitTime = 0;
         }
         
         public void setPriority(int priority){
             this.priority = priority;
         }
-        
+        /*
         public int compareTo(Process prcs){
             int compare = ((Process)prcs).burstTime;
             return this.burstTime - compare;
+        }
+*/      
+        //if priority is there uncomment this code                
+        public int compareTo(Process prcs){
+            int compare = ((Process)prcs).priority;
+            return compare - this.priority;
         }
     }
     public static void main(String[] args) {
@@ -54,7 +63,7 @@ public class OS {
             processes[i] = new Process(s.nextInt(), s.nextInt(), s.nextInt());
         }
                
-        print("Do you want to prioritize the processes? 1/0 for yes/no");
+        System.out.println("Do you want to prioritize the processes? 1/0 for yes/no");
         int binAsk = s.nextInt();
         if(binAsk == 1){
             for(int i = 0; i < numPro; i++)
@@ -67,7 +76,7 @@ public class OS {
         print("Processes Stored");
         print("Choose the sheduling algorithm - \n "
                 + "1. Round Robin\n"
-                + "2. Shortest Job First Preemtive\n "
+                + " 2. Shortest Job First Preemtive\n "
                 + "3. Shortest Job First Non-Preemtive\n "
                 + "4. First Come First Serve\n "
                 + "5. Priority Scheduling\n");
@@ -102,7 +111,41 @@ public class OS {
     /////ALGORITHMS/////
     
     private static void roundRobin(Process prcs[]){
+        //implement the round robin algorithm using a queue 
+        print("Enter the length of quantum you want to use for round robin");
+        Scanner s = new Scanner(System.in);
+        int quantum = s.nextInt();
+        int n = prcs.length;
+        LinkedList<Process> queue = new LinkedList<Process>();
+        for(int i = 0; i < n; i++)
+            queue.add(prcs[i]);
+        int timeLine = 0;
+        print("Here you go with the process time line:");
+        System.out.print(timeLine);
+        while(!queue.isEmpty()){
+            Process k = queue.poll();
+            k.waitTime += (timeLine - k.startTime);
+            System.out.print("--P" + k.processId + "--");
+            if(k.burstTime>quantum){
+                k.burstTime-=quantum;
+                queue.add(k);
+                timeLine+=quantum;
+            }else{
+                timeLine+=k.burstTime;
+                k.burstTime = 0;
+            }
+            k.startTime = timeLine;
+            System.out.print(timeLine);
+        }
         
+        print("The wait times in order of the processes:");
+        int sum = 0;
+        for(int i = 0; i < n; i++){
+            print("Process: " + prcs[i].processId + " Wait time: " + prcs[i].waitTime);
+            sum+=prcs[i].waitTime;
+        }
+        sum/=n;
+        print("Average wait time is " + sum);
     }
         
     private static void sjfPre(Process prcs[]){
@@ -113,10 +156,9 @@ public class OS {
         
         waitTimes[0] = 0;
         
-        Stack<Process> stk = new Stack<Process>();
         int curWait = 0;
         for(int i = 0; i < n; i++){
-            if()
+            
         }
     }
     
@@ -165,19 +207,39 @@ public class OS {
     }
     
     private static void prioritySche(Process prcs[]){
+        int n = prcs.length;
+        int waitTimes[] = new int[n];
         
+        int sum = 0;
+        //as the sort used is stable and we have the 
+        //processes in the order of arrival times 
+        //what we'll get is a stable order of the processes
+        //so there is no need to worry about the priority 
+        //clashing.
+        Arrays.sort(prcs);
+        
+        waitTimes[0] = 0;
+        
+        int curWait = prcs[0].burstTime;
+        
+        for(int i = 1; i < n; i++){
+            waitTimes[i] = curWait - prcs[i].startTime;
+            curWait+=prcs[i].burstTime;
+            sum+=waitTimes[i];
+        }
+        
+        sum/=n;
+        printDetails(waitTimes, sum, prcs);
     }
-
-
     /////HELPER FUNCTIONS///////
-    private static void printDetails(int waitTimes[], int avg, Process prcs[]){
+    public static void printDetails(int waitTimes[], int avg, Process prcs[]){
         print("The wait times in order of the processes:");
         for(int i = 0; i < waitTimes.length; i++){
             print("Process: " + prcs[i].processId + " Wait time: " + waitTimes[i]);
         }
         print("Average wait time is " + avg);
     }
-    private static void print(String s){
+    public static void print(String s){
         System.out.println(s);
     }
     
