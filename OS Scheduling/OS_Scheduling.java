@@ -37,17 +37,17 @@ public class OS {
         public void setPriority(int priority){
             this.priority = priority;
         }
-        /*
+        
         public int compareTo(Process prcs){
             int compare = ((Process)prcs).burstTime;
             return this.burstTime - compare;
         }
-*/      
+ 
         //if priority is there uncomment this code                
-        public int compareTo(Process prcs){
+        /*public int compareTo(Process prcs){
             int compare = ((Process)prcs).priority;
             return compare - this.priority;
-        }
+        }*/
     }
     public static void main(String[] args) {
         // TODO code application logic here
@@ -76,8 +76,8 @@ public class OS {
         print("Processes Stored");
         print("Choose the sheduling algorithm - \n "
                 + "1. Round Robin\n"
-                + " 2. Shortest Job First Pre-emptive\n "
-                + "3. Shortest Job First Non-Pre-emptive\n "
+                + " 2. Shortest Job First Preemtive\n "
+                + "3. Shortest Job First Non-Preemtive\n "
                 + "4. First Come First Serve\n "
                 + "5. Priority Scheduling\n");
         Scanner s = new Scanner(System.in);
@@ -149,19 +149,42 @@ public class OS {
     }
         
     private static void sjfPre(Process prcs[]){
-        int n = prcs.length;
-        int waitTimes[] = new int[n];
+        int n = prcs.length;                    
+        //maintain a time line to calculate the wait 
+        //times easily for the processes
+        int timeLine = 0;
+        //this is the total timeline
+        int runTime = 22;   
         
-        int sum = 0;
+        LinkedList<Process> stack = new LinkedList<Process>();
         
-        waitTimes[0] = 0;
+        //add the first process in the queue
+        stack.add(prcs[0]);
         
-        int curWait = 0;
-        for(int i = 0; i < n; i++){
+        int curProcessIndex = 1;
+        for(int i = 0; i < runTime; i++){                     
+            if(stack.isEmpty()){
+                stack.push(prcs[curProcessIndex++]);               
+            }
+            Process cur = stack.peek();
+            cur.burstTime--;
+            if(cur.burstTime==0)
+                stack.remove(cur);
             
+            timeLine++;                
+            print("Current process is " + cur.processId);
+            if(curProcessIndex<prcs.length &&
+                    timeLine >= prcs[curProcessIndex].startTime && 
+                    prcs[curProcessIndex].burstTime < cur.burstTime 
+                    ){
+                
+                stack.push(prcs[curProcessIndex++]);                
+            }            
         }
+        print("Simulation Done!");
     }
     
+  
     private static void sjfNonPre(Process prcs[]){
         int n = prcs.length;
         int waitTimes[] = new int[n];
@@ -242,5 +265,7 @@ public class OS {
     public static void print(String s){
         System.out.println(s);
     }
-    
+    public static void print(int s){
+        System.out.println(s);
+    }
 }
